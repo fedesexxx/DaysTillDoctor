@@ -56,8 +56,8 @@ Then open `index.html` in your browser.
 
 Possible future improvements:
 
-- [ ] Graduation milestone animations
-- [ ] Dark/light mode
+- [x] Graduation milestone animations
+- [x] Dark/light mode
 - [ ] Shareable countdown links
 
 ---

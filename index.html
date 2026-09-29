@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DaysTillDoctor</title>
+<meta name="theme-color" content="#eef1ec">
+<script>
+  // aplica el tema guardado ANTES de pintar, para evitar el destello claro al recargar en oscuro
+  (function(){
+    var t = 'light';
+    try{ if(localStorage.getItem('medCountdownTheme') === 'dark') t = 'dark'; }catch(e){}
+    document.documentElement.setAttribute('data-theme', t);
+    var m = document.querySelector('meta[name="theme-color"]');
+    if(m) m.setAttribute('content', t === 'dark' ? '#0e1613' : '#eef1ec');
+  })();
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Space+Mono:wght@400;700&display=swap');
 
@@ -14,6 +25,21 @@
     --line:#c7d0c3;
     --accent:#3f6b52;
     --accent-2:#8a2f2f;
+    --muted:#5a655c;
+    --muted-2:#899284;
+    color-scheme:light;
+  }
+
+  :root[data-theme="dark"]{
+    --ink:#e4ebe2;
+    --paper:#0e1613;
+    --paper-2:#16211c;
+    --line:#2b3a33;
+    --accent:#7cb894;
+    --accent-2:#e08a83;
+    --muted:#95a398;
+    --muted-2:#6d7b70;
+    color-scheme:dark;
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -86,7 +112,7 @@
     font-family:'Space Mono', monospace;
     font-size:.68rem;
     letter-spacing:.06em;
-    color:#5a655c;
+    color:var(--muted);
     margin-bottom:7px;
   }
 
@@ -165,6 +191,23 @@
   }
 
   .hidden{ display:none !important; }
+
+  .dev-btn{
+    background:transparent;
+    border:1.5px solid var(--accent);
+    color:var(--accent);
+    font-family:'Space Mono', monospace;
+    font-size:.62rem;
+    letter-spacing:.04em;
+    padding:7px 10px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+
+  .dev-btn:hover{
+    background:var(--accent);
+    color:var(--paper);
+  }
 
   /* ---------- MAIN PAGE ---------- */
   main{
@@ -247,7 +290,7 @@
     font-family:'Space Mono', monospace;
     font-size:.7rem;
     letter-spacing:.08em;
-    color:#5a655c;
+    color:var(--muted);
     margin-bottom:40px;
   }
 
@@ -291,7 +334,7 @@
     font-family:'Space Mono', monospace;
     font-size:.62rem;
     letter-spacing:.05em;
-    color:#5a655c;
+    color:var(--muted);
     margin-top:6px;
   }
 
@@ -300,7 +343,7 @@
     font-family:'Space Mono', monospace;
     font-size:.65rem;
     letter-spacing:.03em;
-    color:#899284;
+    color:var(--muted-2);
   }
 
   .milestones{
@@ -315,7 +358,7 @@
     font-family:'Space Mono', monospace;
     font-size:.68rem;
     letter-spacing:.05em;
-    color:#5a655c;
+    color:var(--muted);
     list-style:none;
     display:flex;
     align-items:center;
@@ -330,11 +373,19 @@
     color:var(--accent);
   }
 
-  .milestones[open] summary::before{
+  .milestones[open] > summary::before{
     content:'−';
   }
 
   .milestones summary:hover{ color:var(--ink); }
+
+  /* secciones dentro del menú OPCIONES */
+  .milestones .milestones.nested{
+    margin-top:18px;
+    padding-top:14px;
+    margin-left:2px;
+  }
+  .milestones > .milestones.nested:first-of-type{ margin-top:16px; }
 
   .milestones-table{
     margin-top:14px;
@@ -350,7 +401,7 @@
     gap:12px;
     padding:6px 0;
     border-bottom:1px solid var(--line);
-    color:#5a655c;
+    color:var(--muted);
   }
 
   .milestones-table .row span:first-child{
@@ -372,7 +423,7 @@
   .lang-switch button{
     background:transparent;
     border:1px solid var(--line);
-    color:#5a655c;
+    color:var(--muted);
     padding:4px 9px;
     cursor:pointer;
     transition:all .15s ease;
@@ -391,9 +442,98 @@
   @media (prefers-reduced-motion: reduce){
     .go-btn, .bar-fill{ transition:none; }
   }
+
+  /* ---------- MODO OSCURO (botón) ---------- */
+  .theme-toggle{
+    position:fixed;
+    top:18px;
+    left:18px;
+    z-index:60;
+    width:32px;
+    height:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--muted);
+    cursor:pointer;
+    transition:color .2s ease, border-color .2s ease;
+  }
+  .theme-toggle:hover{ color:var(--ink); border-color:var(--ink); }
+  .theme-toggle svg{ display:block; }
+  .theme-toggle .icon-sun{ display:none; }
+  :root[data-theme="dark"] .theme-toggle .icon-sun{ display:block; }
+  :root[data-theme="dark"] .theme-toggle .icon-moon{ display:none; }
+
+  /* ---------- PANTALLA COMPLETA ---------- */
+  .fs-enter{
+    display:block;
+    margin:22px auto 0;
+    background:transparent;
+    border:1.5px solid var(--ink);
+    color:var(--ink);
+    font-family:'Space Mono', monospace;
+    font-size:.66rem;
+    letter-spacing:.05em;
+    padding:8px 14px;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease;
+  }
+  .fs-enter:hover{ background:var(--ink); color:var(--paper); }
+
+  .fs-exit{
+    display:none;
+    position:fixed;
+    top:18px;
+    right:18px;
+    z-index:1002;
+    width:34px;
+    height:34px;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--muted);
+    font-family:'Space Mono', monospace;
+    font-size:.9rem;
+    line-height:1;
+    cursor:pointer;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .fs-exit.show{ opacity:.75; pointer-events:auto; }
+  .fs-exit:hover{ opacity:1; }
+
+  body.fs-mode .fs-exit{ display:block; }
+  body.fs-mode .lang-switch,
+  body.fs-mode .theme-toggle,
+  body.fs-mode .percent-label,
+  body.fs-mode .stats,
+  body.fs-mode main details,
+  body.fs-mode main footer,
+  body.fs-mode .fs-enter{ display:none !important; }
+
+  body.fs-mode main{ max-width:1100px; }
+  body.fs-mode .greeting{
+    font-size:clamp(2rem, 6.5vw, 4.2rem);
+    margin-bottom:56px;
+  }
+  body.fs-mode .percent{ font-size:clamp(3rem, 12vw, 9rem); }
+  body.fs-mode .percent-wrap{ margin-bottom:36px; }
+  body.fs-mode .bar-track{ height:4px; margin-bottom:0; }
 </style>
 </head>
 <body>
+
+<canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1001;display:none"></canvas>
+
+<button type="button" class="fs-exit" id="fsExitBtn" aria-label="Exit full screen">✕</button>
+
+
+<button type="button" class="theme-toggle" id="themeToggle" aria-label="Modo oscuro" title="Modo oscuro">
+  <svg class="icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
+  <svg class="icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+</button>
 
 <div class="lang-switch">
   <button data-lang="es" class="active">ES</button>
@@ -429,7 +569,7 @@
     <details class="milestones" style="margin-top:22px;">
       <summary data-i18n="tieneSemilla">¿YA TIENES TU SEMILLA?</summary>
       <div class="title-row" style="margin-top:14px;">
-        <input type="text" id="semillaInput" placeholder="pega tu código aquí" data-i18n-placeholder="semillaPlaceholder" autocomplete="off">
+        <input type="text" id="semillaInput" placeholder="pega tu código aquí" data-i18n-placeholder="semillaPlaceholder" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
         <button id="semillaBtn" data-i18n="btnUsar" style="flex:0 0 auto; padding:8px 14px; margin-top:0; background:transparent; border:1.5px solid var(--ink); color:var(--ink); font-family:'Space Mono', monospace; font-size:.66rem; letter-spacing:.05em; cursor:pointer; transition:background .2s ease, color .2s ease;" onmouseover="this.style.background='var(--ink)'; this.style.color='var(--paper)';" onmouseout="this.style.background='transparent'; this.style.color='var(--ink)';">USAR</button>
       </div>
       <div class="error-msg" id="semillaError"></div>
@@ -460,20 +600,42 @@
     </div>
   </div>
 
-  <details class="milestones">
-    <summary data-i18n="tuSemilla">TU SEMILLA (para usar en otro dispositivo)</summary>
-    <div style="margin-top:14px; display:flex; gap:8px; align-items:center;">
-      <input type="text" id="semillaOutput" readonly style="font-family:'Space Mono', monospace; font-size:.68rem; border-bottom:1.5px solid var(--ink); flex:1; min-width:0; padding:8px 2px; background:transparent; color:var(--ink);">
-      <button id="copiarSemillaBtn" data-i18n="btnCopiar" style="flex:0 0 auto; padding:8px 14px; margin-top:0; background:transparent; border:1.5px solid var(--ink); color:var(--ink); font-family:'Space Mono', monospace; font-size:.66rem; letter-spacing:.05em; cursor:pointer; transition:background .2s ease, color .2s ease;" onmouseover="this.style.background='var(--ink)'; this.style.color='var(--paper)';" onmouseout="this.style.background='transparent'; this.style.color='var(--ink)';">COPIAR</button>
-    </div>
-    <div style="font-family:'Space Mono', monospace; font-size:.62rem; color:#5a655c; margin-top:10px;" data-i18n="semillaHint">
-      Pégala en otro dispositivo, en el campo "¿ya tienes tu semilla?" del inicio.
-    </div>
+  <button type="button" class="fs-enter" id="fsEnterBtn" data-i18n="pantallaCompleta">PANTALLA COMPLETA</button>
+
+  <details class="milestones" id="opcionesMenu">
+    <summary data-i18n="opciones">OPCIONES</summary>
+    <details class="milestones nested">
+      <summary data-i18n="tuSemilla">TU SEMILLA (para usar en otro dispositivo)</summary>
+      <div style="margin-top:14px; display:flex; gap:8px; align-items:center;">
+        <input type="text" id="semillaOutput" readonly style="font-family:'Space Mono', monospace; font-size:.68rem; border-bottom:1.5px solid var(--ink); flex:1; min-width:0; padding:8px 2px; background:transparent; color:var(--ink);">
+        <button id="copiarSemillaBtn" data-i18n="btnCopiar" style="flex:0 0 auto; padding:8px 14px; margin-top:0; background:transparent; border:1.5px solid var(--ink); color:var(--ink); font-family:'Space Mono', monospace; font-size:.66rem; letter-spacing:.05em; cursor:pointer; transition:background .2s ease, color .2s ease;" onmouseover="this.style.background='var(--ink)'; this.style.color='var(--paper)';" onmouseout="this.style.background='transparent'; this.style.color='var(--ink)';">COPIAR</button>
+      </div>
+      <div style="font-family:'Space Mono', monospace; font-size:.62rem; color:var(--muted); margin-top:10px;" data-i18n="semillaHint">
+        Pégala en otro dispositivo, en el campo "¿ya tienes tu semilla?" del inicio.
+      </div>
+    </details>
+
+    <details class="milestones nested">
+      <summary data-i18n="fechasCada">FECHAS DE CADA PORCENTAJE</summary>
+      <div class="milestones-table" id="milestonesTable"></div>
+    </details>
   </details>
 
-  <details class="milestones">
-    <summary data-i18n="fechasCada">FECHAS DE CADA PORCENTAJE</summary>
-    <div class="milestones-table" id="milestonesTable"></div>
+  <details class="milestones hidden" id="devDetails" open>
+    <summary>MODO DEV</summary>
+
+    <div id="devPanel" style="margin-top:16px; padding-top:14px; border-top:1px dashed var(--line);">
+      <div style="font-family:'Space Mono', monospace; font-size:.64rem; letter-spacing:.05em; color:var(--accent); margin-bottom:10px;">
+        MODO DEV — panel de pruebas
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <button type="button" class="dev-btn" id="devConfetti">🎉 CONFETI</button>
+        <button type="button" class="dev-btn" id="devPct50">IR A 50%</button>
+        <button type="button" class="dev-btn" id="devPct99">IR A 99%</button>
+        <button type="button" class="dev-btn" id="devPct100">IR A 100%</button>
+        <button type="button" class="dev-btn" id="devReset">RESET DEV</button>
+      </div>
+    </div>
   </details>
 
   <footer id="footerDates">— / —</footer>
@@ -506,6 +668,10 @@
       semillaHint: 'Pégala en otro dispositivo, en el campo "¿ya tienes tu semilla?" del inicio.',
       fechasCada: 'FECHAS DE CADA PORCENTAJE',
       reiniciar: 'reiniciar datos',
+      pantallaCompleta: 'PANTALLA COMPLETA',
+      temaOscuro: 'Modo oscuro',
+      temaClaro: 'Modo claro',
+      opciones: 'OPCIONES',
       cargando: 'Cargando',
       bienvenido: 'Bienvenido',
       bienvenida: 'Bienvenida',
@@ -536,6 +702,10 @@
       semillaHint: 'Paste it on another device, in the "already have your seed?" field on the home screen.',
       fechasCada: 'DATE FOR EACH PERCENTAGE',
       reiniciar: 'reset data',
+      pantallaCompleta: 'FULL SCREEN',
+      temaOscuro: 'Dark mode',
+      temaClaro: 'Light mode',
+      opciones: 'OPTIONS',
       cargando: 'Loading',
       bienvenido: 'Welcome',
       bienvenida: 'Welcome',
@@ -566,6 +736,10 @@
       semillaHint: 'Enganxa-la en un altre dispositiu, al camp "ja tens la teva llavor?" de l\'inici.',
       fechasCada: 'DATA DE CADA PERCENTATGE',
       reiniciar: 'reinicia les dades',
+      pantallaCompleta: 'PANTALLA COMPLETA',
+      temaOscuro: 'Mode fosc',
+      temaClaro: 'Mode clar',
+      opciones: 'OPCIONS',
       cargando: 'Carregant',
       bienvenido: 'Benvingut',
       bienvenida: 'Benvinguda',
@@ -603,6 +777,7 @@
     document.querySelectorAll('.lang-switch button').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.lang === currentLang);
     });
+    actualizarBotonTema();
 
     // en inglés no existe distinción Dr./Dra., mostramos solo "Dr."
     const tituloSelect = document.getElementById('titulo');
@@ -645,6 +820,65 @@
     try{ saved = localStorage.getItem('medCountdownLang') || 'es'; }catch(e){}
     applyLang(saved);
   })();
+
+  // ---------- CONFETI ----------
+  let ultimoEnteroConfeti = null;
+  let confettiAnimId = null;
+
+  function lanzarConfeti(){
+    const cv = document.getElementById('confetti-canvas');
+    const ctx = cv.getContext('2d');
+    cv.style.display = 'block';
+    cv.width = innerWidth;
+    cv.height = innerHeight;
+    const oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+    const cols = oscuro
+      ? ['#7cb894', '#e08a83', '#e4ebe2', '#95a398', '#f0ad4e']
+      : ['#3f6b52', '#8a2f2f', '#14211d', '#c7d0c3', '#f0ad4e'];
+    const ps = Array.from({length: 130}, () => ({
+      x: Math.random() * cv.width,
+      y: -10 - Math.random() * 200,
+      w: 7 + Math.random() * 8,
+      h: 4 + Math.random() * 5,
+      c: cols[Math.floor(Math.random() * cols.length)],
+      a: Math.random() * Math.PI * 2,
+      sp: (Math.random() - .5) * .18,
+      vx: (Math.random() - .5) * 3,
+      vy: 2 + Math.random() * 4,
+      al: 1
+    }));
+    if(confettiAnimId) cancelAnimationFrame(confettiAnimId);
+    let done = false;
+    function draw(){
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      ps.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.a += p.sp;
+        if(p.y > cv.height * .7) p.al = Math.max(0, p.al - .025);
+        ctx.save(); ctx.globalAlpha = p.al; ctx.translate(p.x, p.y); ctx.rotate(p.a);
+        ctx.fillStyle = p.c; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
+      });
+      if(ps.every(p => p.al <= 0)){
+        cv.style.display = 'none';
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        done = true;
+      }
+      if(!done) confettiAnimId = requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  function checarHitoConfeti(pct){
+    const enteroActual = Math.floor(pct);
+    if(ultimoEnteroConfeti === null){
+      // primera lectura: solo guardamos, no disparamos (evita confeti al cargar la página)
+      ultimoEnteroConfeti = enteroActual;
+      return;
+    }
+    if(enteroActual > ultimoEnteroConfeti){
+      ultimoEnteroConfeti = enteroActual;
+      lanzarConfeti();
+    }
+  }
 
   const percentEl = document.getElementById('percent');
   let digitSlots = {}; // key: index in string -> {strip element, currentDigit}
@@ -708,6 +942,45 @@
   const errorMsg = document.getElementById('errorMsg');
   const overlay = document.getElementById('overlay');
 
+  // ---------- MODO DEV ----------
+  let devOffsetPct = null; // si no es null, forzamos el % en vez de calcular por fecha real
+
+  const devDetails = document.getElementById('devDetails');
+
+  function activarModoDev(){
+    devForzarPct(null);                  // monta "Dra. Yuyina 2024-2030" si aún no hay contador
+    devDetails.classList.remove('hidden'); // muestra el panel en la pantalla del contador
+  }
+
+  function devForzarPct(p){
+    // si aún no hay contador arrancado, montamos uno de mentiras para poder probar
+    if(!inicio || !fin){
+      inicio = new Date('2024-01-01T00:00:00');
+      fin = new Date('2030-01-01T00:00:00');
+      nombrePuro = 'Yuyina';
+      ultimoTitulo = 'Dra.';
+      tituloNombre = 'Dra. Yuyina';
+      overlay.classList.add('hidden');
+      document.getElementById('greeting').innerHTML = `${t('bienvenida')}, <em>${tituloNombre}</em>`;
+      document.getElementById('footerDates').textContent =
+        `${inicio.toLocaleDateString(t('dateLocale'))} — ${fin.toLocaleDateString(t('dateLocale'))}`;
+      document.getElementById('semillaOutput').value =
+        generarSemilla({ titulo: 'Dra.', nombre: 'Yuyina', fi: '2024-01-01', ff: '2030-01-01' });
+      renderMilestones();
+      if(!rafId) startCounter();
+    }
+    if(p !== null) devOffsetPct = p;
+  }
+
+  document.getElementById('devConfetti').addEventListener('click', lanzarConfeti);
+  document.getElementById('devPct50').addEventListener('click', () => devForzarPct(50));
+  document.getElementById('devPct99').addEventListener('click', () => devForzarPct(99));
+  document.getElementById('devPct100').addEventListener('click', () => devForzarPct(100));
+  document.getElementById('devReset').addEventListener('click', () => {
+    devOffsetPct = null;
+    ultimoEnteroConfeti = null;
+  });
+
   function generarSemilla(data){
     // comprimimos a algo cortito: T|nombre|fi|ff codificado en base64
     const raw = `${data.titulo}|${data.nombre}|${data.fi}|${data.ff}`;
@@ -715,12 +988,35 @@
       .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   }
 
+  function fechaValida(s){
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+    if(!m) return false;
+    const y = +m[1], mo = +m[2], d = +m[3];
+    const dt = new Date(y, mo - 1, d);
+    return dt.getFullYear() === y && dt.getMonth() === mo - 1 && dt.getDate() === d;
+  }
+
   function leerSemilla(semilla){
     try{
-      const b64 = semilla.replace(/-/g,'+').replace(/_/g,'/');
+      // al copiar/pegar se cuelan comillas, puntos, espacios y caracteres invisibles: solo dejamos el alfabeto base64
+      const limpia = semilla.replace(/[^A-Za-z0-9_\-+\/]/g, '');
+      if(!limpia) return null;
+      const b64 = limpia.replace(/-/g,'+').replace(/_/g,'/');
       const raw = decodeURIComponent(escape(atob(b64)));
-      const [titulo, nombre, fi, ff] = raw.split('|');
-      if(!titulo || !nombre || !fi || !ff) return null;
+
+      // formato: titulo|nombre|fi|ff. Leemos desde los extremos para que un "|" dentro del nombre no rompa nada
+      const partes = raw.split('|');
+      if(partes.length < 4) return null;
+      const titulo = partes[0];
+      const ff = partes[partes.length - 1];
+      const fi = partes[partes.length - 2];
+      const nombre = partes.slice(1, -2).join('|').trim();
+
+      if(titulo !== 'Dr.' && titulo !== 'Dra.') return null;
+      if(!nombre) return null;
+      if(!fechaValida(fi) || !fechaValida(ff)) return null;
+      if(new Date(ff + 'T00:00:00') <= new Date(fi + 'T00:00:00')) return null;
+
       return { titulo, nombre, fi, ff };
     }catch(e){ return null; }
   }
@@ -758,11 +1054,104 @@
     }catch(e){ /* si falla, se queda el popup normal */ }
   })();
 
+  // ---------- MODO OSCURO ----------
+  function temaActual(){
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  }
+
+  function actualizarBotonTema(){
+    const btn = document.getElementById('themeToggle');
+    if(!btn) return;
+    const label = temaActual() === 'dark' ? t('temaClaro') : t('temaOscuro');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+  }
+
+  function aplicarTema(tema){
+    document.documentElement.setAttribute('data-theme', tema);
+    const m = document.querySelector('meta[name="theme-color"]');
+    if(m) m.setAttribute('content', tema === 'dark' ? '#0e1613' : '#eef1ec');
+    try{ localStorage.setItem('medCountdownTheme', tema); }catch(e){}
+    actualizarBotonTema();
+  }
+
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    aplicarTema(temaActual() === 'dark' ? 'light' : 'dark');
+  });
+  actualizarBotonTema();
+
+  // ---------- PANTALLA COMPLETA ----------
+  const fsEnterBtn = document.getElementById('fsEnterBtn');
+  const fsExitBtn = document.getElementById('fsExitBtn');
+  let fsTimer = null;
+
+  function enFullscreenNativo(){
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function mostrarSalirTemporal(){
+    fsExitBtn.classList.add('show');
+    clearTimeout(fsTimer);
+    fsTimer = setTimeout(() => fsExitBtn.classList.remove('show'), 2500);
+  }
+
+  function entrarPantallaCompleta(){
+    document.body.classList.add('fs-mode'); // vista limpia siempre, aunque el navegador no soporte fullscreen real
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if(req){
+      try{
+        const p = req.call(el);
+        if(p && p.catch) p.catch(() => {}); // si lo rechaza, se queda la vista limpia
+      }catch(e){}
+    }
+    mostrarSalirTemporal();
+  }
+
+  function salirPantallaCompleta(){
+    document.body.classList.remove('fs-mode');
+    fsExitBtn.classList.remove('show');
+    if(enFullscreenNativo()){
+      const ex = document.exitFullscreen || document.webkitExitFullscreen;
+      try{
+        const p = ex.call(document);
+        if(p && p.catch) p.catch(() => {});
+      }catch(e){}
+    }
+  }
+
+  fsEnterBtn.addEventListener('click', entrarPantallaCompleta);
+  fsExitBtn.addEventListener('click', salirPantallaCompleta);
+
+  // si sale con Esc del fullscreen nativo, quitamos también la vista limpia
+  function alCambiarFullscreen(){
+    if(!enFullscreenNativo()) salirPantallaCompleta();
+  }
+  document.addEventListener('fullscreenchange', alCambiarFullscreen);
+  document.addEventListener('webkitfullscreenchange', alCambiarFullscreen);
+
+  // en la vista limpia sin fullscreen nativo, Esc también sale
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && document.body.classList.contains('fs-mode')) salirPantallaCompleta();
+  });
+
+  // la ✕ aparece un momento al mover el mouse o tocar la pantalla
+  ['mousemove', 'touchstart', 'keydown'].forEach(ev => {
+    document.addEventListener(ev, () => {
+      if(document.body.classList.contains('fs-mode')) mostrarSalirTemporal();
+    }, { passive: true });
+  });
+
   document.getElementById('semillaBtn').addEventListener('click', () => {
     const semillaError = document.getElementById('semillaError');
     const val = document.getElementById('semillaInput').value.trim();
     if(!val){
       semillaError.textContent = t('errSemillaVacia');
+      return;
+    }
+    if(val.toLowerCase() === 'yuyina'){
+      semillaError.textContent = '';
+      activarModoDev();
       return;
     }
     const data = leerSemilla(val);
@@ -844,11 +1233,15 @@
       const restante = fin - now;
 
       let pct = (transcurrido / total) * 100;
+      if(devOffsetPct !== null){
+        pct = devOffsetPct;
+      }
       if(pct < 0) pct = 0;
       if(pct > 100) pct = 100;
 
       const pctStr = pct.toFixed(6);
       updateDigits(pctStr);
+      checarHitoConfeti(pct);
 
       document.getElementById('barFill').style.width = pct + '%';
 
